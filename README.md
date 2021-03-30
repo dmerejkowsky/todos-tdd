@@ -1,5 +1,8 @@
 # Todo manager
 
+An example of using TDD to implement a TODO manager
+that looks like this:
+
 ```
 >>> + Apprendre Python
 1 [ ] Apprendre Python
@@ -19,6 +22,11 @@
 2 [x] Apprendre TDD
 ```
 
-1. parsing
-2. update tasks list
-3. persistence
+Steps:
+
+1. parsing commands
+2. updating the tasks list
+3. writing the main loop
+
+Note: implementing persistence of the task list
+is left as an exercise to the reader.
