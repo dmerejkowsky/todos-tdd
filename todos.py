@@ -1,8 +1,14 @@
 def main():
     task_manager = TaskManager()
+    print(task_manager)
     while True:
         command = input(">>> ")
+        if command == "quit":
+            break
         action = parse(command)
+        if not action:
+            print("invalid command")
+            continue
         task_manager.execute(action)
         print(task_manager)
 
