@@ -1,4 +1,14 @@
-from todos import AddAction, DeleteAction, Task, TaskManager, UpdateAction, parse
+from todos import (
+    AddAction,
+    DeleteAction,
+    Task,
+    TaskManager,
+    UpdateAction,
+    parse,
+    Repository,
+)
+
+import pytest
 
 
 def test_can_create_an_add_action():
@@ -57,14 +67,33 @@ def test_can_parse_set_not_done_command():
     assert action.done is False
 
 
-def test_task_manager_has_no_tasks_by_default():
-    task_manager = TaskManager()
+def test_can_load_and_save_tasks(tmp_path):
+    """Scenario:
+    * Create a Repository with two tasks
+    * Re-create an other Repository
+    * Check that the new repository also has two tasks
+    """
+    pickle_path = tmp_path / "tasks.pickle"
+    # Arrange
+    task_1 = Task(number=1, description="task one", done=False)
+    task_2 = Task(number=2, description="task two", done=True)
+    tasks = [task_1, task_2]
+    repository = Repository(pickle_path)
+    repository.save_tasks(tasks)
 
+    # Act
+    repository = Repository(pickle_path)
+    loaded_tasks = repository.load_tasks()
+
+    # Assert
+    assert loaded_tasks == tasks
+
+
+def test_task_manager_has_no_tasks_by_default(task_manager):
     assert task_manager.tasks == []
 
 
-def test_execute_add_action():
-    task_manager = TaskManager()
+def test_execute_add_action(task_manager):
     add_action = AddAction(description="new task")
 
     task_manager.execute(add_action)
@@ -74,7 +103,7 @@ def test_execute_add_action():
     assert actual.number == 1
 
 
-def test_execute_update_action():
+def test_execute_update_action(task_manager):
     """Scenario:
 
     * Create a TaskManager with one task('task one') that is not done
@@ -84,7 +113,6 @@ def test_execute_update_action():
 
     * Check that action number 1 is now done
     """
-    task_manager = TaskManager()
     task_manager.tasks = [Task(number=1, description="task one", done=False)]
     update_action = UpdateAction(number=1, done=True)
 
@@ -94,7 +122,7 @@ def test_execute_update_action():
     assert actual.done is True
 
 
-def test_execute_delete_action():
+def test_execute_delete_action(task_manager):
     """Scenario:
 
     * Create a TaskManager with one task('task one') that is not done
@@ -104,7 +132,6 @@ def test_execute_delete_action():
 
     * Check that tasks list is empty
     """
-    task_manager = TaskManager()
     task_manager.tasks = [Task(number=1, description="task one", done=False)]
     delete_action = DeleteAction(number=1)
 

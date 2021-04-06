@@ -1,5 +1,11 @@
+import pickle
+from pathlib import Path
+
+
 def main():
-    task_manager = TaskManager()
+    pickle_path = Path("tasks.pickle")
+    task_manager = TaskManager(pickle_path)
+    task_manager.load_tasks()
     print(task_manager)
     while True:
         command = input(">>> ")
@@ -11,11 +17,34 @@ def main():
             continue
         task_manager.execute(action)
         print(task_manager)
+    task_manager.save_tasks()
 
+class Repository():
+    def __init__(self, path):
+        self.path = path
+    
+    def save_tasks(self, tasks):
+        with open(self.path, "wb") as f:
+            pickle.dump(tasks, f)
+    
+    def load_tasks(self):
+        if not self.path.exists():
+            return []
+        with open(self.path, "rb") as f:
+            return pickle.load(f)
 
 class TaskManager:
-    def __init__(self):
+    def __init__(self, path):
         self.tasks = []
+        # Delegate tasks persistence to the Repository class
+        self.repository = Repository(path)
+        self.load_tasks()
+    
+    def load_tasks(self):
+        self.tasks = self.repository.load_tasks()
+    
+    def save_tasks(self):
+        self.repository.save_tasks(self.tasks)
 
     def execute(self, action):
         if isinstance(action, AddAction):
@@ -90,6 +119,16 @@ class Task:
     def __str__(self):
         box = "[x]" if self.done else "[ ]"
         return f"{self.number} {box} {self.description}"
+    
+    def __repr__(self):
+        return f"Task<#{self.number} - {self.description} done: {self.done}>"
+    
+    def __eq__(self, other):
+        return (
+            self.number == other.number and 
+            self.description == other.description and 
+            self.done == other.done
+        )
 
 
 def extract_argument(cmd):
