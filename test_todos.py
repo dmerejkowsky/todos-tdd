@@ -73,15 +73,15 @@ def test_can_load_and_save_tasks(tmp_path):
     * Re-create an other Repository
     * Check that the new repository also has two tasks
     """
-    pickle_path = tmp_path / "tasks.pickle"
+    db_path = tmp_path / "tasks.db"
 
     # Arrange
-    repository = Repository(pickle_path)
+    repository = Repository(db_path)
     repository.add_task(description="task one")
     repository.add_task(description="task two")
 
     # Act
-    repository = Repository(pickle_path)
+    repository = Repository(db_path)
     loaded_tasks = repository.load_tasks()
 
     # Assert

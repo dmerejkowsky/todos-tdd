@@ -1,17 +1,16 @@
-import pickle
 from pathlib import Path
 
 import sqlite3
 
 
 def main():
-    pickle_path = Path("tasks.pickle")
-    task_manager = TaskManager(pickle_path)
+    db_path = Path("tasks.db")
+    task_manager = TaskManager(db_path)
     task_manager.load_tasks()
     print(task_manager)
     while True:
         command = input(">>> ")
-        if command == "quit":
+        if command in ("quit", "q"):
             break
         action = parse(command)
         if not action:
@@ -19,7 +18,6 @@ def main():
             continue
         task_manager.execute(action)
         print(task_manager)
-    task_manager.save_tasks()
 
 
 class Repository:
@@ -92,9 +90,10 @@ class TaskManager:
         self.repository.update_task(number=action.number, done=action.done)
 
     def __str__(self):
-        if not self.tasks:
+        tasks = self.load_tasks()
+        if not tasks:
             return "Nothing to be done yet"
-        return "\n".join(str(t) for t in self.tasks)
+        return "\n".join(str(t) for t in tasks)
 
 
 def parse(cmd):
