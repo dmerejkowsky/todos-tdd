@@ -1,6 +1,8 @@
 import pickle
 from pathlib import Path
 
+import sqlite3
+
 
 def main():
     pickle_path = Path("tasks.pickle")
@@ -19,32 +21,58 @@ def main():
         print(task_manager)
     task_manager.save_tasks()
 
-class Repository():
+
+class Repository:
     def __init__(self, path):
         self.path = path
-    
-    def save_tasks(self, tasks):
-        with open(self.path, "wb") as f:
-            pickle.dump(tasks, f)
-    
-    def load_tasks(self):
         if not self.path.exists():
-            return []
-        with open(self.path, "rb") as f:
-            return pickle.load(f)
+            connection = sqlite3.connect(self.path)
+            with open("schema.sql") as f:
+                connection.execute(f.read())
+                connection.commit()
+
+        self.connection = sqlite3.connect(self.path)
+        self.connection.row_factory = sqlite3.Row
+
+    def add_task(self, *, description):
+        cursor = self.connection.cursor()
+        cursor.execute(
+            """
+            INSERT INTO tasks(description, done)
+            VALUES (?, false)
+        """,
+            (description,),
+        )
+        self.connection.commit()
+
+    def load_tasks(self):
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT number, done, description FROM tasks")
+        res = []
+        for row in cursor.fetchall():
+            task = Task(
+                number=row["number"], done=row["done"], description=row["description"]
+            )
+            res.append(task)
+        return res
+
+    def delete_task(self, *, number):
+        cursor = self.connection.cursor()
+        cursor.execute("DELETE FROM tasks WHERE number=?", (number,))
+        self.connection.commit()
+
+    def update_task(self, *, number, done):
+        cursor = self.connection.cursor()
+        cursor.execute("UPDATE tasks SET done=? WHERE number=?", (done, number))
+        self.connection.commit()
+
 
 class TaskManager:
     def __init__(self, path):
-        self.tasks = []
-        # Delegate tasks persistence to the Repository class
         self.repository = Repository(path)
-        self.load_tasks()
-    
+
     def load_tasks(self):
-        self.tasks = self.repository.load_tasks()
-    
-    def save_tasks(self):
-        self.repository.save_tasks(self.tasks)
+        return self.repository.load_tasks()
 
     def execute(self, action):
         if isinstance(action, AddAction):
@@ -55,25 +83,13 @@ class TaskManager:
             self.execute_delete(action)
 
     def execute_add(self, action):
-        description = action.description
-        number = len(self.tasks) + 1
-        task = Task(number=number, description=description, done=False)
-        self.tasks.append(task)
+        self.repository.add_task(description=action.description)
 
     def execute_delete(self, action):
-        number = action.number
-        self.tasks = [t for t in self.tasks if t.number != number]
+        self.repository.delete_task(number=action.number)
 
     def execute_update(self, action):
-        number = action.number
-        done = action.done
-        task = self.find_task(number=number)
-        task.done = done
-
-    def find_task(self, *, number):
-        for i, task in enumerate(self.tasks, start=1):
-            if i == number:
-                return task
+        self.repository.update_task(number=action.number, done=action.done)
 
     def __str__(self):
         if not self.tasks:
@@ -119,15 +135,15 @@ class Task:
     def __str__(self):
         box = "[x]" if self.done else "[ ]"
         return f"{self.number} {box} {self.description}"
-    
+
     def __repr__(self):
         return f"Task<#{self.number} - {self.description} done: {self.done}>"
-    
+
     def __eq__(self, other):
         return (
-            self.number == other.number and 
-            self.description == other.description and 
-            self.done == other.done
+            self.number == other.number
+            and self.description == other.description
+            and self.done == other.done
         )
 
 

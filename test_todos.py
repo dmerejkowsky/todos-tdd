@@ -74,23 +74,22 @@ def test_can_load_and_save_tasks(tmp_path):
     * Check that the new repository also has two tasks
     """
     pickle_path = tmp_path / "tasks.pickle"
+
     # Arrange
-    task_1 = Task(number=1, description="task one", done=False)
-    task_2 = Task(number=2, description="task two", done=True)
-    tasks = [task_1, task_2]
     repository = Repository(pickle_path)
-    repository.save_tasks(tasks)
+    repository.add_task(description="task one")
+    repository.add_task(description="task two")
 
     # Act
     repository = Repository(pickle_path)
     loaded_tasks = repository.load_tasks()
 
     # Assert
-    assert loaded_tasks == tasks
+    assert len(loaded_tasks) == 2
 
 
 def test_task_manager_has_no_tasks_by_default(task_manager):
-    assert task_manager.tasks == []
+    assert task_manager.load_tasks() == []
 
 
 def test_execute_add_action(task_manager):
@@ -98,7 +97,7 @@ def test_execute_add_action(task_manager):
 
     task_manager.execute(add_action)
 
-    (actual,) = task_manager.tasks
+    (actual,) = task_manager.load_tasks()
     assert actual.description == "new task"
     assert actual.number == 1
 
@@ -113,13 +112,13 @@ def test_execute_update_action(task_manager):
 
     * Check that action number 1 is now done
     """
-    task_manager.tasks = [Task(number=1, description="task one", done=False)]
-    update_action = UpdateAction(number=1, done=True)
+    task_manager.repository.add_task(description="task one")
 
+    update_action = UpdateAction(number=1, done=True)
     task_manager.execute(update_action)
 
-    (actual,) = task_manager.tasks
-    assert actual.done is True
+    (actual,) = task_manager.load_tasks()
+    assert actual.done
 
 
 def test_execute_delete_action(task_manager):
@@ -132,9 +131,9 @@ def test_execute_delete_action(task_manager):
 
     * Check that tasks list is empty
     """
-    task_manager.tasks = [Task(number=1, description="task one", done=False)]
-    delete_action = DeleteAction(number=1)
+    task_manager.repository.add_task(description="task one")
 
+    delete_action = DeleteAction(number=1)
     task_manager.execute(delete_action)
 
-    assert not task_manager.tasks
+    assert not task_manager.load_tasks()
