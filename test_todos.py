@@ -69,7 +69,7 @@ def test_can_parse_set_not_done_command():
     assert action.done is False
 
 
-def test_can_load_and_save_tasks():
+def test_repository_can_add_clean_and_load():
     """Scenario:
     * Create a Repository with two tasks
     * Re-create an other Repository
