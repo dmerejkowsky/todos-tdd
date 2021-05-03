@@ -5,7 +5,9 @@ import sqlite3
 
 def main():
     db_path = Path("tasks.db")
-    task_manager = TaskManager(db_path)
+    repository = SQLiteRepository(db_path)
+    task_manager = TaskManager()
+    task_manager.set_repository(repository)
     task_manager.load_tasks()
     print(task_manager)
     while True:
@@ -20,7 +22,7 @@ def main():
         print(task_manager)
 
 
-class Repository:
+class SQLiteRepository:
     def __init__(self, path):
         self.path = path
         if not self.path.exists():
@@ -75,8 +77,11 @@ class Repository:
 
 
 class TaskManager:
-    def __init__(self, path):
-        self.repository = Repository(path)
+    def __init__(self):
+        self.repository = None
+
+    def set_repository(self, repository):
+        self.repository = repository
 
     def load_tasks(self):
         return self.repository.load_tasks()

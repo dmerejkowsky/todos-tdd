@@ -1,12 +1,14 @@
 import pytest
 from pathlib import Path
 
-from todos import TaskManager
+from todos import TaskManager, SQLiteRepository
 
 
 @pytest.fixture
 def task_manager():
     sqlite_path = Path("tests.db")
-    task_manager = TaskManager(sqlite_path)
-    task_manager.repository.clean()
+    repository = SQLiteRepository(sqlite_path)
+    repository.clean()
+    task_manager = TaskManager()
+    task_manager.set_repository(repository)
     return task_manager

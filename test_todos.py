@@ -7,7 +7,7 @@ from todos import (
     TaskManager,
     UpdateAction,
     parse,
-    Repository,
+    SQLiteRepository,
 )
 
 import pytest
@@ -78,14 +78,14 @@ def test_can_load_and_save_tasks():
     db_path = Path("tests.db")
 
     # Arrange
-    repository = Repository(db_path)
+    repository = SQLiteRepository(db_path)
     repository.clean()
 
     repository.add_task(description="task one")
     repository.add_task(description="task two")
 
     # Act
-    repository = Repository(db_path)
+    repository = SQLiteRepository(db_path)
     loaded_tasks = repository.load_tasks()
 
     # Assert
