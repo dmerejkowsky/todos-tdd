@@ -41,7 +41,7 @@ git fetch upstream
 git branch --set-upstream-to=upstream/master
 ```
 
-Now, if you are on the `master` branch, you can run `git pull` to synchorize changes
+Now, if you are on the `master` branch, you can run `git pull` to synchronize changes
 from upstream.
 
 You can also create a new branch like `your-name` and push it to your fork
