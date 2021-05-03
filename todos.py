@@ -32,6 +32,15 @@ class Repository:
         self.connection = sqlite3.connect(self.path)
         self.connection.row_factory = sqlite3.Row
 
+    def clean(self):
+        cursor = self.connection.cursor()
+        cursor.execute(
+            """
+            DELETE FROM tasks
+            """
+        )
+        self.connection.commit()
+
     def add_task(self, *, description):
         cursor = self.connection.cursor()
         cursor.execute(

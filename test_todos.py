@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from todos import (
     AddAction,
     DeleteAction,
@@ -67,16 +69,18 @@ def test_can_parse_set_not_done_command():
     assert action.done is False
 
 
-def test_can_load_and_save_tasks(tmp_path):
+def test_can_load_and_save_tasks():
     """Scenario:
     * Create a Repository with two tasks
     * Re-create an other Repository
     * Check that the new repository also has two tasks
     """
-    db_path = tmp_path / "tasks.db"
+    db_path = Path("tests.db")
 
     # Arrange
     repository = Repository(db_path)
+    repository.clean()
+
     repository.add_task(description="task one")
     repository.add_task(description="task two")
 
