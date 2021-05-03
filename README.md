@@ -28,5 +28,3 @@ Steps:
 2. updating the tasks list
 3. writing the main loop
 
-Note: implementing persistence of the task list
-is left as an exercise to the reader.
