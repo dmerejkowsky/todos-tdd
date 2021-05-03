@@ -7,4 +7,6 @@ from todos import TaskManager
 @pytest.fixture
 def task_manager():
     sqlite_path = Path("tests.db")
-    return TaskManager(sqlite_path)
+    task_manager = TaskManager(sqlite_path)
+    task_manager.repository.clean()
+    return task_manager
