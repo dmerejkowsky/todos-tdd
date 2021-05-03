@@ -22,9 +22,33 @@ that looks like this:
 2 [x] Apprendre TDD
 ```
 
-Steps:
+## How to fork this project
 
-1. parsing commands
-2. updating the tasks list
-3. writing the main loop
+* Visit https://github.com/dmerejkowsky/todos-tdd
+* Click on "fork" (top-right button)
+
+```bash
+# Clone your fork
+git clone https://github.com/yourname-todos-tdd
+
+# Add the 'upstream' remote
+git remote add upstream https://git@github.com/dmerejkowsky/todos-tdd.git
+# Fetch it
+git fetch upstream
+
+# Configure the local 'master' branch to track the remote 'master' branch f
+# from upstream
+git branch --set-upstream-to=upstream/master
+```
+
+Now, if you are on the `master` branch, you can run `git pull` to synchorize changes
+from upstream.
+
+You can also create a new branch like `your-name` and push it to your fork
+
+```bash
+git checkout your-name
+# Change files, make commit
+git push origin your-name
+```
 
