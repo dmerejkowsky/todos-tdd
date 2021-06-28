@@ -99,7 +99,7 @@ class TaskManager:
         self.repository.add_task(description=action.description)
 
     def execute_delete(self, action):
-        self.repository.delete_task(number=action.number)
+        self.repository.add_task(number=action.number)
 
     def execute_update(self, action):
         self.repository.update_task(number=action.number, done=action.done)
