@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from pathlib import Path
 
 import sqlite3
@@ -123,20 +124,20 @@ def parse(cmd):
         return UpdateAction(number=number, done=True)
 
 
+@dataclass
 class AddAction:
-    def __init__(self, *, description):
-        self.description = description
+    description: str
 
 
+@dataclass
 class DeleteAction:
-    def __init__(self, *, number):
-        self.number = number
+    number: int
 
 
+@dataclass
 class UpdateAction:
-    def __init__(self, *, number, done):
-        self.number = number
-        self.done = done
+    number: int
+    done: bool
 
 
 class Task:
